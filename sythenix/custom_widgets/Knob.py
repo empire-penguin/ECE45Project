@@ -1,33 +1,24 @@
-from tkinter import Frame
-from tkinter import Label
-from tkinter import Canvas
-from tkinter import BOTH
+import tkinter as tk
 
-
-class Knob(Frame):
-    def __init__(self, parent, high=1, low=0, text=""):
-        super(Knob, self).__init__()
-
+class Knob(tk.Frame):
+    def __init__(self, parent=None, high=1, low=0, text=""):
+        tk.Frame.__init__(self, parent)
         self.isDiscrete = False
         self.high = high
         self.low = low
         self.currentValue = low
-        self.text = text
+        self.text = tk.Label(self)
 
-        self.canvas = Canvas(self)
+        self.canvas = tk.Canvas(self)
+        
 
         self.drawButton()
 
     def drawButton(self):
-
-        x = self.canvas.winfo_width()/2
-        y = self.canvas.winfo_height()/2
-
-        r = 100
-        
-        self.canvas.create_oval(r/2+5*x,r/2+5*y,r,r,fill="red")
+        self.canvas.create_oval(100,60,180,140,fill="red")
         self.canvas.configure(bg="cyan")
-        self.canvas.grid()
+        
 
 
+    
 
