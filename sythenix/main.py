@@ -1,4 +1,9 @@
 #Import libraries used
+
+#### System ####
+import queue
+import sys
+
 #### Interface ####
 import tkinter as tk
 import sounddevice as sd
@@ -6,12 +11,12 @@ import soundfile as sf
 
 #### Math ####
 import numpy as np
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
-# Implement the default Matplotlib key bindings.
-from matplotlib.backend_bases import key_press_handler
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backend_bases import key_press_handler # Used to implement the default Matplotlib key bindings.
 from matplotlib.figure import Figure
-
+from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
+
 
 #### Custom Widgets ####
 from custom_widgets.Knob import Knob
@@ -26,6 +31,9 @@ class App(tk.Tk):
     
     def __init__(self):
         super().__init__()
+
+        # randomizes at this point
+        np.random.seed(19680801)
 
         # define root windows main properties
         self.title("Sythenix")
@@ -43,45 +51,70 @@ class App(tk.Tk):
         self.columnconfigure(3,weight=1)
         self.columnconfigure(4,weight=1)
 
+        # Define menu bar
+        menubar = tk.Menu(self, background='#ff8000', foreground='black', activebackground='white', activeforeground='black')  
+        file = tk.Menu(menubar, tearoff=1, background='#ffcc99', foreground='black')  
+        file.add_command(label="New")  
+        file.add_command(label="Open")  
+        file.add_command(label="Save")  
+        file.add_command(label="Save as")    
+        file.add_separator()  
+        file.add_command(label="Exit", command=self._quit)  
+        menubar.add_cascade(label="File", menu=file)  
+
+        edit = tk.Menu(menubar, tearoff=0)  
+        edit.add_command(label="Undo")  
+        edit.add_separator()     
+        edit.add_command(label="Cut")  
+        edit.add_command(label="Copy")  
+        edit.add_command(label="Paste")  
+        menubar.add_cascade(label="Edit", menu=edit)  
+
+        help = tk.Menu(menubar, tearoff=0)  
+        help.add_command(label="About", command=self.about)  
+        menubar.add_cascade(label="Help", menu=help)  
+
+        self.config(menu=menubar)
+
         # populate window
         self.populate()
 
     def populate(self):
-        np.random.seed(19680801)
-
-        dt = 0.001
+        
+        dt = 0.0001
         t = np.arange(0, 10, dt)
-        nse = np.random.randn(len(t))
-        r = np.exp(-t / 0.05)
+        f1 = 220
+        s = 2*np.sin(2 * np.pi * f1 * t)
 
-        cnse = np.convolve(nse, r) * dt
-        cnse = cnse[:len(t)]
-        s = 2*np.sin(2 * np.pi * t)
+        fs = 1/dt
+        sd.play(s, fs)
 
-        synthTransformFig = Figure((20,5),dpi=100)
+        inputFigure, ax1 = plt.subplots(figsize=(10,5), dpi=40)
+        inputFigure.suptitle('Input Signal', fontsize=16)
 
-        a1 = synthTransformFig.add_subplot(131)
-        a1.plot(t, s)
-        a1.label = "Hello"
-        a2 = synthTransformFig.add_subplot(132)
-        a2.plot(t, cnse)
-        a3 = synthTransformFig.add_subplot(133)
-        a3.plot(t, nse)
+        outputFigure, ax2 = plt.subplots(figsize=(10,5), dpi=40)
+        outputFigure.suptitle('Output Signal', fontsize=16)
 
-        '''
-        add_subplot(nrows, ncols, index)
-            Three integers (nrows, ncols, index). The subplot will take the index 
-            position on a grid with nrows rows and ncols columns. 
-            index starts at 1 in the upper left corner and increases to the right. 
-            index can also be a two-tuple specifying the (first, last) indices 
-            (1-based, and including last) of the subplot, e.g., fig.add_subplot(3, 1, (1, 2)) 
-            makes a subplot that spans the upper 2/3 of the figure.
-        '''
+        ax1.plot(t, s)
+        ax2.plot(t, 2*s) 
+        
+        ax1.set_xlim((0.0,0.1))
+        ax1.set_ylim((-4,4))
+        
+        ax2.set_xlim((0.0,0.1))
+        ax2.set_ylim((-4,4))
 
-        self.matlabCanvas = FigureCanvasTkAgg(synthTransformFig, master=self)
-        self.matlabCanvas.draw()
-        tk_matlabCanvas = self.matlabCanvas.get_tk_widget()
-        tk_matlabCanvas.grid(column=0,row=0,sticky=tk.E,padx=0,pady=0,ipadx=0,ipady=0)
+        inputCanvas = FigureCanvasTkAgg(inputFigure, master=self)
+        inputCanvas.draw()
+
+        tk_inputCanvas = inputCanvas.get_tk_widget()
+        tk_inputCanvas.grid(column=0,row=0,sticky=tk.NW,columnspan=2,padx=0,pady=0,ipadx=0,ipady=0)
+
+        outputCanvas = FigureCanvasTkAgg(outputFigure, master=self)
+        outputCanvas.draw()
+
+        tk_outputCanvas = outputCanvas.get_tk_widget()
+        tk_outputCanvas.grid(column=3,row=0,sticky=tk.NE,columnspan=2,padx=0,pady=0,ipadx=0,ipady=0)
         
         # tk_matlabCanvas.
 
@@ -95,20 +128,71 @@ class App(tk.Tk):
     # #     key_press_handler(event, self.inputCanvas, self.outputCanvas)
 
 
-    # def _quit(self):
-    #     self.quit()     # stops mainloop
-    #     self.destroy()  # this is necessary on Windows to prevent
-    #                     # Fatal Python Error: PyEval_RestoreThread: NULL tstate
+    def _quit(self):
+        self.quit()     # stops mainloop
+        self.destroy()  # this is necessary on Windows to prevent
+
+    def about(self):
+        tk.messagebox.showinfo('Sythenix', 'A GUI for modifying audio signals.')
 
 if __name__ == "__main__":
-    fs = 44100 
-    seconds = 2
-    myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
-    sd.wait()
-    sd.play(myrecording, samplerate=fs)
-    sd.wait()
-
-    sf.write('sound.wav', myrecording, fs)
 
     app = App() 
     app.mainloop()
+
+
+######################################################## Sound Visualizer Code ################################################################
+
+"""
+
+q = queue.Queue()
+
+
+def audio_callback(indata, frames, time, status):
+
+    if status:
+        print(status, file=sys.stderr)
+    # Fancy indexing with mapping creates a (necessary!) copy:
+    q.put(indata[::10, mapping])
+
+
+def update_plot(frame):
+
+    global plotdata
+    while True:
+        try:
+            data = q.get_nowait()
+        except queue.Empty:
+            break
+        shift = len(data)
+        plotdata = np.roll(plotdata, -shift, axis=0)
+        plotdata[-shift:, :] = data
+    for column, line in enumerate(lines):
+        line.set_ydata(plotdata[:, column])
+    return lines
+
+
+    
+device_info = sd.query_devices(3, 'input')
+samplerate = device_info['default_samplerate']
+length = int(200 * samplerate / (1000 * 10))
+plotdata = np.zeros((length, 1))
+fig, ax = plt.subplots()
+lines = ax.plot(plotdata)
+
+ax.axis((0, len(plotdata), -1, 1))
+ax.set_yticks([0])
+ax.yaxis.grid(True)
+ax.tick_params(bottom=False, top=False, labelbottom=False,
+               right=False, left=False, labelleft=False)
+fig.tight_layout(pad=0)
+
+stream = sd.InputStream(
+    device=3, channels=1,
+    samplerate=samplerate, callback=audio_callback)
+ani = FuncAnimation(fig, update_plot, interval=30, blit=True)
+
+with stream:
+    plt.show()
+
+"""
