@@ -68,9 +68,6 @@ class App(tk.Tk):
         a3 = synthTransformFig.add_subplot(133)
         a3.plot(t, nse)
 
-       
-    
-
         '''
         add_subplot(nrows, ncols, index)
             Three integers (nrows, ncols, index). The subplot will take the index 
