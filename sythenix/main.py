@@ -103,9 +103,9 @@ class App(tk.Tk):
         tk_outputCanvas = outputCanvas.get_tk_widget()
         tk_outputCanvas.grid(column=0,row=0,sticky=tk.N,columnspan=5,padx=0,pady=0,ipadx=0,ipady=0)
 
-        var = tk.DoubleVar()
-        scale = tk.Scale( self, variable = var )
-        scale.pack(anchor=tk.CENTER)
+        amplitude = tk.DoubleVar()
+        scale = tk.Scale( self, variable = amplitude )
+        scale.grid(column=0,row=2,sticky=tk.NSEW,padx=0,pady=0,ipadx=0,ipady=0)
                 
         # tk_matlabCanvas.
 
