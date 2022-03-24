@@ -87,7 +87,7 @@ class App(tk.Tk):
         s = 2*np.sin(2 * np.pi * f1 * t)
 
         fs = 1/dt
-        sd.play(s, fs)
+        # sd.play(s, fs)
 
         inputFigure, ax1 = plt.subplots(figsize=(10,5), dpi=40)
         inputFigure.suptitle('Input Signal', fontsize=16)
