@@ -1,6 +1,7 @@
 This is a digital sythesizer written in python for an ECE45 Project
 
 hello Cassia
+hi goofball, I love you
 
 MacOS
 -------
