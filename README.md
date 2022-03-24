@@ -1,4 +1,4 @@
-This is a digital sythesizer written in python for a ECE45 Project
+This is a digital sythesizer written in python for an ECE45 Project
 
 MacOS
 -------
