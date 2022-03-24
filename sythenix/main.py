@@ -82,39 +82,26 @@ class App(tk.Tk):
     def populate(self):
         
         dt = 0.0001
-        t = np.arange(0, 10, dt)
+        t = np.arange(-10, 10, dt)
         f1 = 220
         s = 2*np.sin(2 * np.pi * f1 * t)
 
         fs = 1/dt
         # sd.play(s, fs)
 
-        inputFigure, ax1 = plt.subplots(figsize=(10,5), dpi=40)
-        inputFigure.suptitle('Input Signal', fontsize=16)
-
-        outputFigure, ax2 = plt.subplots(figsize=(10,5), dpi=40)
+        outputFigure, ax1 = plt.subplots(figsize=(20,5), dpi=40)
         outputFigure.suptitle('Output Signal', fontsize=16)
 
-        ax1.plot(t, s)
-        ax2.plot(t, 2*s) 
+        ax1.plot(t,s) 
         
-        ax1.set_xlim((0.0,0.1))
+        ax1.set_xlim((-0.1,0.1))
         ax1.set_ylim((-4,4))
-        
-        ax2.set_xlim((0.0,0.1))
-        ax2.set_ylim((-4,4))
-
-        inputCanvas = FigureCanvasTkAgg(inputFigure, master=self)
-        inputCanvas.draw()
-
-        tk_inputCanvas = inputCanvas.get_tk_widget()
-        tk_inputCanvas.grid(column=0,row=0,sticky=tk.NW,columnspan=2,padx=0,pady=0,ipadx=0,ipady=0)
 
         outputCanvas = FigureCanvasTkAgg(outputFigure, master=self)
         outputCanvas.draw()
 
         tk_outputCanvas = outputCanvas.get_tk_widget()
-        tk_outputCanvas.grid(column=3,row=0,sticky=tk.NE,columnspan=2,padx=0,pady=0,ipadx=0,ipady=0)
+        tk_outputCanvas.grid(column=0,row=0,sticky=tk.N,columnspan=5,padx=0,pady=0,ipadx=0,ipady=0)
         
         # tk_matlabCanvas.
 
